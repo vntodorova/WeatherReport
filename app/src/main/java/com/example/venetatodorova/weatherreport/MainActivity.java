@@ -1,5 +1,6 @@
 package com.example.venetatodorova.weatherreport;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
     ArrayAdapter<String> adapter;
     ArrayList<String> cities;
     MyFragment fragment;
-    Dialog dialog;
+    ReportDialogFragment dialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
         setContentView(R.layout.activity_main);
 
         android.app.FragmentManager fragmentManager = getFragmentManager();
-        fragment = (MyFragment) fragmentManager.findFragmentByTag("Tag");
+        fragment = (MyFragment) fragmentManager.findFragmentByTag("Fragment");
 
         if (fragment != null) {
             cities = fragment.getCities();
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
             fragment = MyFragment.newInstance();
             cities = new ArrayList<>();
             fragment.setCities(cities);
-            fragmentTransaction.add(android.R.id.content,fragment,"Tag");
+            fragmentTransaction.add(android.R.id.content,fragment,"Fragment");
             fragmentTransaction.commit();
         }
         fragment.setListener(this);
@@ -60,19 +61,14 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
 
     @Override
     public void onDownloadFinished(String report) {
-        dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog);
-        dialog.setTitle("Weather report..");
+        android.app.FragmentManager fm = getFragmentManager();
+        dialogFragment = new ReportDialogFragment();
+        dialogFragment = ReportDialogFragment.newInstance();
+        dialogFragment.setData(report);
+        dialogFragment.show(fm,"DialogFragment");
+    }
 
-        TextView text = (TextView) dialog.findViewById(R.id.textView);
-        text.setText(report);
-        Button button = (Button) dialog.findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
+    public void closeDialog() {
+        dialogFragment.dismiss();
     }
 }
