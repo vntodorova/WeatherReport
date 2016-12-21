@@ -61,14 +61,8 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
 
     @Override
     public void onDownloadFinished(String report) {
-        android.app.FragmentManager fm = getFragmentManager();
         dialogFragment = new ReportDialogFragment();
-        dialogFragment = ReportDialogFragment.newInstance();
-        dialogFragment.setData(report);
-        dialogFragment.show(fm,"DialogFragment");
-    }
-
-    public void closeDialog() {
-        dialogFragment.dismiss();
+        dialogFragment = ReportDialogFragment.newInstance(report);
+        dialogFragment.show(getFragmentManager(),"DialogFragment");
     }
 }

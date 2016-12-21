@@ -11,14 +11,11 @@ import android.widget.Button;
 public class ReportDialogFragment extends DialogFragment{
 
     TextView textView;
-    String data;
+    static String data;
     Button button;
 
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public static ReportDialogFragment newInstance() {
+    public static ReportDialogFragment newInstance(String report) {
+        data = report;
         return new ReportDialogFragment();
     }
 
@@ -32,7 +29,7 @@ public class ReportDialogFragment extends DialogFragment{
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity)getActivity()).closeDialog();
+                dismiss();
             }
         });
         return v;
@@ -41,6 +38,6 @@ public class ReportDialogFragment extends DialogFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 }
