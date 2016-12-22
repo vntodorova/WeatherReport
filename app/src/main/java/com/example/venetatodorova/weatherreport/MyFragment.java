@@ -3,12 +3,14 @@ package com.example.venetatodorova.weatherreport;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class MyFragment extends Fragment {
 
     ArrayList<String> cities;
-    DownloadListener listener;
+    WeakReference<DownloadListener> listener;
     public STATE state = STATE.NEUTRAL;
     DownloadReportTask downloadTask;
     ProgressDialog progressDialog;
@@ -24,7 +26,7 @@ public class MyFragment extends Fragment {
     }
 
     public void setListener(DownloadListener listener) {
-        this.listener = listener;
+        this.listener = new WeakReference<>(listener);
     }
 
     @Override
@@ -46,7 +48,7 @@ public class MyFragment extends Fragment {
             @Override
             public void onDownloadFinished(String report) {
                 state = STATE.DOWNLOADED;
-                listener.onDownloadFinished(report);
+                listener.get().onDownloadFinished(report);
             }
         });
         downloadTask.execute(cities.get(position));
