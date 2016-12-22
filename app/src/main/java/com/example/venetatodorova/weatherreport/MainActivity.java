@@ -1,16 +1,14 @@
 package com.example.venetatodorova.weatherreport;
 
-import android.support.v4.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.ListView;
-import android.widget.Button;
-import android.app.Dialog;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MyFragment.DownloadListener {
@@ -30,15 +28,16 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
 
         if (fragment != null) {
             cities = fragment.getCities();
+            if(fragment.state != MyFragment.STATE.DOWNLOADED) fragment.progressDialog.show();
         } else {
             android.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragment = MyFragment.newInstance();
             cities = new ArrayList<>();
+            cities.add("London");
             fragment.setCities(cities);
-            fragmentTransaction.add(android.R.id.content,fragment,"Fragment");
+            fragmentTransaction.add(android.R.id.content, fragment, "Fragment");
             fragmentTransaction.commit();
         }
-        fragment.setListener(this);
 
         ListView listView = (ListView) findViewById(R.id.listView);
         adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,cities);
@@ -51,6 +50,19 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
         });
     }
 
+    @Override
+    protected void onPause() {
+        fragment.setListener(null);
+        if(fragment.progressDialog != null) fragment.progressDialog.dismiss();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        fragment.setListener(this);
+        super.onResume();
+    }
+
     public void addCity(View view) {
         EditText editText = (EditText) findViewById(R.id.addCity_editText);
         String city = editText.getText().toString();
@@ -61,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements MyFragment.Downlo
 
     @Override
     public void onDownloadFinished(String report) {
+        fragment.progressDialog.dismiss();
         dialogFragment = new ReportDialogFragment();
         dialogFragment = ReportDialogFragment.newInstance(report);
         dialogFragment.show(getFragmentManager(),"DialogFragment");

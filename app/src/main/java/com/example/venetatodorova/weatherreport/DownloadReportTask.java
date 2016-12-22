@@ -14,34 +14,18 @@ class DownloadReportTask extends AsyncTask<String,String,Void> {
 
     private JSONObject data;
     private MyFragment.DownloadListener listener;
-    private ProgressDialog progressDialog;
-    private Activity activity;
 
     void setListener(MyFragment.DownloadListener listener) {
         this.listener = listener;
     }
 
-    DownloadReportTask(Activity activity){
-        this.activity = activity;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        progressDialog = new ProgressDialog(activity);
-        progressDialog.setMessage("Downloading weather report...");
-        progressDialog.setMax(100);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setCancelable(true);
-        progressDialog.show();
-    }
-
-    @Override
-    protected void onProgressUpdate(String... values) {
-        progressDialog.setProgress(Integer.parseInt(values[0]));
-    }
-
     @Override
     protected Void doInBackground(String... strings) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String city = strings[0];
         try {
             URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q="+city+"&APPID=e9a1658cdd2c1971f6ae6521334d4277");
@@ -62,7 +46,6 @@ class DownloadReportTask extends AsyncTask<String,String,Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        progressDialog.dismiss();
         StringBuilder report = new StringBuilder();
         try {
             report.append("Temperature: ").append(data.getJSONObject("main").get("temp").toString()).append("K");
@@ -73,6 +56,7 @@ class DownloadReportTask extends AsyncTask<String,String,Void> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         listener.onDownloadFinished(report.toString());
 
     }
